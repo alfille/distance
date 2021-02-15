@@ -118,6 +118,10 @@ In fact that result is in the `example` directory
 Result:
 ![](example/Distance.png)
 
+* x-axis: Dimension
+* y-axis: Average segment length (normalized to longest diagonal)
+* Curves: Different metrics from p=1 to p=10
+
 ## Precision
 Calculations are done in [double precision](https://en.wikipedia.org/wiki/Double-precision_floating-point_format) floating point which limits the exponent to about 10^-300. Since the calculation involves multiplying numbers from 0.0 to 1.0 by themselves, dimension = 200 is probably safe. (i.e. 0.1^200)
 
@@ -126,9 +130,9 @@ Note that the normalized (to the longest diagonal) appears to reach an assymptot
 
 ![Assymptotic](images/Assymptote.png)
 
-* Here power (p in Lp metric) is on x-axis
-* Normalized average distance is y-axis
-* Plots after Dim=25 .. Dim=200 are shown
+* x-axis: power (p in Lp metric)
+* y-axis: Average segment length (normalized to longest diagonal)
+* Curves: Various dimensions (25,50,75,100,150,200)
 * Since Linf devolves to Max metric, it makes sense that values approach 1.0
 
 # Discussion
