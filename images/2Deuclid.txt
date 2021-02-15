@@ -1,0 +1,1 @@
+\int _{ 0 }^{ 1 }{ \int _{ 0 }^{ 1 }{ \int _{ 0 }^{ 1 }{ \int _{ 0 }^{ 1 }{ \sqrt [ 2 ]{ { \left( { x }_{ 1 }-{ x }_{ 2 } \right)  }^{ 2 }+{ \left( { y }_{ 1 }-{ y }_{ 2 } \right)  }^{ 2 } }  }  } \cdot d{ x }_{ 0 }\cdot d{ x }_{ 1 }\cdot d{ y }_{ 0 }\cdot d{ y }_{ 1 } }  } 

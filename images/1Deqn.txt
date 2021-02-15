@@ -1,0 +1,1 @@
+\int _{ a=0 }^{ a=1 }{ \int _{ b=0 }^{ b=1 }{ |b-a|\cdot db\cdot da=\int _{ a=0 }^{ a=1 }{ \left\{ \int _{ b=0 }^{ b=a }{ \left( a-b \right) \cdot db } -\int _{ b-a }^{ b=1 }{ \left( b-a \right) \cdot db }  \right\}  } \cdot da }  } 
