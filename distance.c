@@ -72,7 +72,7 @@ int main( int argc, char **argv )
     // Initialize random seed
     srand(time(0));
     
-    // Title
+    // Title line
     int p ;
     printf("DIM\\Power, ");
     for (p=1;p<=Powers;++p) {
@@ -94,7 +94,7 @@ int main( int argc, char **argv )
             sum[p] = 0. ;
         }
         
-        // Random tries
+        // Random segments (i.e. 2 points of increasing dimension)
         long r ;
         for (r = 0 ; r < Randoms ; ++r ) {
             
@@ -108,23 +108,29 @@ int main( int argc, char **argv )
             int dd ;
             for (dd = 0 ; dd < d ; ++dd) {
                 double sx = 1. ;
+                // For each dimension, get 2 coordinates in this dimension -- rand() and rand() scaled
+                // we only care about dx, the delta in the coordinate
+                // use abs value for odd powers calculation
                 double dx = fabs((rand() - rand()) * scale ) ;
+                // compute increasing powers of dx the easy way
                 for (p=0;p<Powers;++p) {
                     sx *= dx ;
                     seg[p] += sx ;
                 }
             }
             
-            // Add segments to sum
-            sum[0] += seg[0] ;
-            sum[1] += sqrt(seg[1]) ;
-            for (p=2;p<Powers;++p) {
+            // Add segments to sum, taking the appropriate root
+            sum[0] += seg[0] ; // Manhattan or Taxi
+            sum[1] += sqrt(seg[1]) ; // Euclidean
+            for (p=2;p<Powers;++p) { // this is why Powers must be 3 or higher
+                // note p is 0-indexed in C, but 1-indexed for calculation
                 sum[p] += pow(seg[p],1/(1.+p));
             }
         }
 
         if (Normalize) {
             for (p=0;p<Powers;++p){
+                // note p is 0-indexed in C, but 1-indexed for calculation
                 printf("%g, ",sum[p]/Randoms/pow(d,1/(1.+p)));
             }
         } else {
@@ -132,9 +138,11 @@ int main( int argc, char **argv )
                 printf("%g, ",sum[p]/Randoms);
             }
         }
+        // finish line
         printf("\n");
     }
     
+    // success
     return 0 ;
 }
 
