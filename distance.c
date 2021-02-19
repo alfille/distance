@@ -26,15 +26,15 @@ void help( void )
     printf("\t-n\tnormalize (to longest diagonal)\n");
     printf("\t-h\tthis help\n");
     exit(0) ;
-}    
+}
 
-int main( int argc, char **argv ) 
+int main( int argc, char **argv )
 {
     int Dimensions = 100 ;
     int Powers = 3 ;
     long Randoms = 1000000 ;
     int Normalize = 0;
-    
+
     double scale = 1.0 / RAND_MAX ;
 
 
@@ -71,7 +71,7 @@ int main( int argc, char **argv )
 
     // Initialize random seed
     srand(time(0));
-    
+
     // Title line
     int p ;
     printf("DIM\\Power, ");
@@ -85,25 +85,25 @@ int main( int argc, char **argv )
     for ( d=1 ; d <= Dimensions ; ++d ) {
         double sum[Powers] ;
         int p ;
-        
+
         // Start line with dimension
         printf("%d, ",d);
-        
+
         // zero out sums
-        for (p=0;p<Powers;++p) { 
+        for (p=0;p<Powers;++p) {
             sum[p] = 0. ;
         }
-        
+
         // Random segments (i.e. 2 points of increasing dimension)
         long r ;
         for (r = 0 ; r < Randoms ; ++r ) {
-            
+
             // Zero out segment
             double seg[Powers];
             for (p=0;p<Powers;++p) {
                 seg[p] = 0. ;
             }
-            
+
             // Add up for this dimension
             int dd ;
             for (dd = 0 ; dd < d ; ++dd) {
@@ -118,7 +118,7 @@ int main( int argc, char **argv )
                     seg[p] += sx ;
                 }
             }
-            
+
             // Add segments to sum, taking the appropriate root
             sum[0] += seg[0] ; // Manhattan or Taxi
             sum[1] += sqrt(seg[1]) ; // Euclidean
@@ -141,7 +141,7 @@ int main( int argc, char **argv )
         // finish line
         printf("\n");
     }
-    
+
     // success
     return 0 ;
 }
