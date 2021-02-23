@@ -3,6 +3,25 @@
 
 This is a fun math exercise.
 
+- [distance](#distance)
+  * [One dimension:](#one-dimension-)
+    + [Mathematically:](#mathematically-)
+  * [Two Dimensions](#two-dimensions)
+  * [Higher Dimensions](#higher-dimensions)
+  * [Monti Carlo method](#monti-carlo-method)
+- [Program](#program)
+  * [Getting it](#getting-it)
+  * [Simple installation](#simple-installation)
+  * [Usage](#usage)
+  * [Example](#example)
+  * [Precision](#precision)
+  * [Results](#results)
+- [Plotting](#plotting)
+- [Parallel processing](#parallel-processing)
+- [Discussion](#discussion)
+  * [Known results](#known-results)
+  * [Further](#further)
+
 ## One dimension:
 ![line](images/1D.png)
 
@@ -140,7 +159,11 @@ Note that the normalized (to the longest diagonal) appears to reach an assymptot
 
 # Plotting
 Although the examples here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
-* either pipe data directly `./distance | plot.sh`
+
+* either pipe data directly `./distance -r10000 -n| ./plot.sh`
+![gnuplot](images/gnuplot.png)
+* or use thefilename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
+
 
 # Parallel processing
 There is an [impressive rework](https://github.com/kms15/cubedistance) of this project by Dr. Kendrick Shaw using TensorFlow on GPUs with 400-fold speedup!
@@ -148,7 +171,12 @@ There is an [impressive rework](https://github.com/kms15/cubedistance) of this p
 # Discussion
 
 ## Known results
-Dr. Albert Mao found [known results](https://mathworld.wolfram.com/HypercubeLinePicking.html) for the 2-norm with low dimension and bounds for arbitrary dimension
+Dr. Albert Mao found [known results](https://mathworld.wolfram.com/HypercubeLinePicking.html) for the 2-norm with low dimension and bounds for arbitrary dimension. 
+![Analytic](images/Known.png)
+
+Interestly, MontiCarlo simulation gives a much better estimate.
+
+## Further
 
 If you have references to a better mathematical treatment, please include in the github comments, or to me directly at [paul.alfille@gmail.com](mailto:paul.alfille@gmail.com)
 
