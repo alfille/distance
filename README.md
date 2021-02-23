@@ -143,20 +143,24 @@ Result:
 
 * x-axis: Dimension
 * y-axis: Average segment length (normalized to longest diagonal)
-* Curves: Different metrics from p=1 to p=10
+ * Clearly the length is bounded by the maximum length so the average normalized value must be < 1 
+* Curves: Different p-norms from p=1 to p=10
 
 ## Precision
 Calculations are done in [double precision](https://en.wikipedia.org/wiki/Double-precision_floating-point_format) floating point which limits the exponent to about 10^-300. Since the calculation involves multiplying numbers from 0.0 to 1.0 by themselves, dimension = 200 is probably safe. (i.e. 0.1^200)
 
 ## Results
-Note that the normalized (to the longest diagonal) appears to reach an assymptotic value for each power at higher dimensions.
+Note that the normalized (to the longest diagona) appears to reach an assymptotic value for each power at higher dimensions.
+
+Lets pivot the analysis to p-norm segment limit at increasing dimension 
 
 ![Assymptotic](images/Assymptote.png)
 
-* x-axis: power (p in Lp metric)
+* x-axis: p-norm (p in Lp metric)
+ * Note this is p-norm now, not dimension, on the x-axis
 * y-axis: Average segment length (normalized to longest diagonal)
-* Curves: Various dimensions (25,50,75,100,150,200)
-* Since Linf devolves to Max metric, it makes sense that values approach 1.0 ( i.e. the max value of an infinite number of random values in [0,1] -> 1 )
+* Curves: Various dimensions (25,50,75,100,150,200) -- so incresing dimension suggesting a limitting case
+* Since Linf devolves to the Max metric, it makes sense that values approach 1.0 ( i.e. the max value of an infinite number of random values in [0,1] -> 1 )
 
 # Plotting
 Although the examples here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
@@ -175,7 +179,7 @@ There is an [impressive rework](https://github.com/kms15/cubedistance) of this p
 Dr. Albert Mao found [known results](https://mathworld.wolfram.com/HypercubeLinePicking.html) for the 2-norm with low dimension and bounds for arbitrary dimension. 
 ![Analytic](images/Known.png)
 
-Here the results have been normalized to sqrt(dimension). Interestly, MontiCarlo simulation gives a much better estimate.
+Here the results have been normalized to sqrt(dimension). Interestly, MontiCarlo simulation gives a much better estimate. The [spreadsheet](example/Known.xlsx) that generated this result is in the example directory.
 
 ## Further
 
