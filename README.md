@@ -2,6 +2,7 @@
 **Find average distance between random points in an N-dimensional cube.**
 
 This is a fun math exercise.
+![Taste](images/sample.png)
 
 - [distance](#distance)
   * [One dimension:](#one-dimension-)
@@ -155,14 +156,14 @@ Note that the normalized (to the longest diagonal) appears to reach an assymptot
 * x-axis: power (p in Lp metric)
 * y-axis: Average segment length (normalized to longest diagonal)
 * Curves: Various dimensions (25,50,75,100,150,200)
-* Since Linf devolves to Max metric, it makes sense that values approach 1.0
+* Since Linf devolves to Max metric, it makes sense that values approach 1.0 ( i.e. the max value of an infinite number of random values in [0,1] -> 1 )
 
 # Plotting
 Although the examples here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
 
 * either pipe data directly `./distance -r10000 -n| ./plot.sh`
 ![gnuplot](images/gnuplot.png)
-* or use thefilename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
+* or use the filename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
 
 
 # Parallel processing
@@ -174,7 +175,7 @@ There is an [impressive rework](https://github.com/kms15/cubedistance) of this p
 Dr. Albert Mao found [known results](https://mathworld.wolfram.com/HypercubeLinePicking.html) for the 2-norm with low dimension and bounds for arbitrary dimension. 
 ![Analytic](images/Known.png)
 
-Interestly, MontiCarlo simulation gives a much better estimate.
+Here the results have been normalized to sqrt(dimension). Interestly, MontiCarlo simulation gives a much better estimate.
 
 ## Further
 
