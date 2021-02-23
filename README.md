@@ -47,6 +47,7 @@ There is more than one way to measure the distance between the points:
   * from point (0,0,0...) to (1,1,1,...)
   * For dimension D and Lp metric p: 
   * diagonal = D^(1/p)
+  * From my colleague Dr. Kendrick Shaw this is better termed the **p-norm**
 
   ## Monti Carlo method
   
@@ -56,6 +57,8 @@ There is more than one way to measure the distance between the points:
  * The average distance can be measured
 
   ![MontiCarlo](images/MontiCarlo.png)
+  
+ * My colleague Dr. Albert Mao correctly points out that the program uses a rather poor random number generator. Much better ones aare available (or random physical phenomena can be harvested). Surprisingly, the results are still good.
   
 # Program
 ## Getting it
@@ -135,5 +138,18 @@ Note that the normalized (to the longest diagonal) appears to reach an assymptot
 * Curves: Various dimensions (25,50,75,100,150,200)
 * Since Linf devolves to Max metric, it makes sense that values approach 1.0
 
+# Plotting
+Although the examples here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
+* either pipe data directly `./distance | plot.sh`
+
+# Parallel processing
+There is an [impressive rework](https://github.com/kms15/cubedistance) of this project by Dr. Kendrick Shaw using TensorFlow on GPUs with 400-fold speedup!
+
 # Discussion
+
+## Known results
+Dr. Albert Mao found [known results](https://mathworld.wolfram.com/HypercubeLinePicking.html) for the 2-norm with low dimension and bounds for arbitrary dimension
+
 If you have references to a better mathematical treatment, please include in the github comments, or to me directly at [paul.alfille@gmail.com](mailto:paul.alfille@gmail.com)
+
+
