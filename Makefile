@@ -1,10 +1,14 @@
 CC=gcc
-CFLAGS=-I. -lm
+CFLAGS=-I.
 DEPS =
-OBJ = distance.o 
 
-%.o: %.c $(DEPS)
-	$(CC) -c -o $@ $< $(CFLAGS)
+distance: distance.c
+	$(CC) -o $@ $^ $(CFLAGS) -lm
 
-distance: $(OBJ)
-	$(CC) -o $@ $^ $(CFLAGS)
+distance_x: distance_x.c
+	$(CC) -o $@ $^ $(CFLAGS) -lm
+
+distance_hr: distance_hr.c
+	$(CC) -o $@ $^ $(CFLAGS) -lgmp -lmpfr
+
+all: distance distance_x distance_hr

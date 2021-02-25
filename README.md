@@ -106,6 +106,16 @@ The only requirements are a working C complier and git
 Actually, if you download the code you only need any C compiler
 `cc -o distance distance.c`
 
+### High resolution
+Using the [Gnu Multiprecision library](http://gmplib.org) and [MPFR](http://mpfr.org) gives the distance_hr program
+
+* The syntax and usage is the same
+* A much better random number generator is used
+* On Debian, package libgmp-dev needs to be installed
+* On Debian, package libmpfr-dev needs to be installed
+
+ 
+
 ## Usage
 `./distance -h`
 
