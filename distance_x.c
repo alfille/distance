@@ -87,11 +87,8 @@ int main( int argc, char **argv )
         }
     }
 
-    // zero out the first row (i.e. zero dimensional case) of the sums
     double sums[Dimensions+1][Powers];
-    for (p=0; p<Powers; ++p) {
-        sums[0][p] = 0.;
-    }
+    int sums_exp[Dimensions+1][Powers];
 
     // Generate and add up sums of coordinate differences at various dimensions
     // from two randomly generated points in the hypercube.
@@ -102,22 +99,35 @@ int main( int argc, char **argv )
             // For each dimension, get 2 coordinates in this dimension.
             // we only care about dx, the delta in the coordinate
             // use abs value for odd powers calculation
-            double dx, dx_cumprod;
+            double dx ;
             dx = fabs( genrand64_real1() - genrand64_real1() );
 
             // for each power, the sum will be the entry from the row above
             // plus dx raised to that power.
-            double cumprod = 1;
+            double cum_prod = 1;
+            int cum_exp = 0 ;
             for (p=0; p<Powers; ++p) {
-                cumprod *= dx;
-                sums[d][p] = sums[d-1][p] + cumprod;
+                int e ;
+                cum_prod = frexp( cum_prod * dx, &e );
+                cum_exp += e ;
+                if ( d == 1 ) {
+                    // First row, just place in sum
+                    sums[1][p] = cum_prod ;
+                    sums_exp[1][p] = cum_exp ;
+                } else {
+                    // add mantissa from prior sum expoment
+                    double shiftsum = sums[d-1][p] + ldexp(cum_prod,cum_exp-sums_exp[d-1][p]) ;
+                    sums[d][p] = frexp( shiftsum, &e ) ;
+                    sums_exp[d][p] = sums_exp[d-1][p] + e ;
+                }
             }
         }
 
         // Add the pth root of each sum to the totals
         for (d=1; d <= Dimensions; ++d) {
             for (p=0; p<Powers; ++p) {
-                totals[d][p] += pow(sums[d][p], 1./(p+1));
+                // get fancy -- take integer part of exponent/(p+1) separately
+                totals[d][p] += ldexp( pow(ldexp(sums[d][p],sums_exp[d][p]%(p+1)), 1./(p+1)), sums_exp[d][p] / (p+1) );
             }
         }
     }
