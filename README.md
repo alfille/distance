@@ -107,13 +107,7 @@ Actually, if you download the code you only need any C compiler
 `cc -o distance distance.c`
 
 ### High resolution
-Using the [Gnu Multiprecision library](http://gmplib.org) and [MPFR](http://mpfr.org) gives the distance_hr program
-
-* The syntax and usage is the same
-* A much better random number generator is used
-* On Debian, package libgmp-dev needs to be installed
-* On Debian, package libmpfr-dev needs to be installed
-
+See below under advanced for high-resolution versions
  
 
 ## Usage
@@ -177,11 +171,40 @@ Although the examples here are done with Excel, there is a script based on the u
 
 * either pipe data directly `./distance -r10000 -n| ./plot.sh`
 ![gnuplot](images/gnuplot.png)
-* or use the filename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
+or use the filename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
 
 
 # Parallel processing
 There is an [impressive rework](https://github.com/kms15/cubedistance) of this project by Dr. Kendrick Shaw using TensorFlow on GPUs with 400-fold speedup!
+
+# Higher resolution
+### distance 
+ * The standard `distance` program suffers from:
+ * Poor random number algorhythm (C library `rand()` )
+ * double precision limitations 53-bit mantissa, exponent 10^-308
+ * stack allocation of large arrays
+ * Specifically the concern about precision is that at high power dx^p could pinned at zero (0<dx<1)
+ * The segment length (dx) is weighted to shorter lengths (see [bin.py](example/bin.py)) ![histogram](images/histogram.png) 
+ * so 2% of samples will be <.01 -- underflow at p=150 causing a systematic underestimation
+
+###  distance_hr
+ * `distance_hr` uses high resolution floating point variables
+ * C libraries [GMP](https://gmplib.org/) and [MPFR](https://www.mpfr.org/)  
+ * Load development version e.g. `sudo apt install libgmp-dev` and `sudo apt install mpfr-dev`
+ * Uses [Mersenne twister](https://en.wikipedia.org/wiki/Mersenne_Twister) for random generation
+ * build the program with `make distance_hr` (or `make all`) then `chmod +x distance_hr`
+ * options are the same as for `distance`
+ * by default, results are 32 digits long
+
+###  distance_x
+* `distance_x` improves on distance by addressing underflow and random number algorhythm
+* Standard C library only is needed
+* A modified version of the [Mersenne Twister](http://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/VERSIONS/C-LANG/mt19937-64.c) is used.
+ * uses time() for a seed
+ * removes non-relevant routines
+* Floating point math is performed on the mantissa and exponent separately using ldexp and frexp avoiding underflow
+* build the program with `make distance_x` (or `make all`) then `chmod +x distance_x`
+* options are the same as for `distance`
 
 # Discussion
 
