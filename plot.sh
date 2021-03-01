@@ -24,5 +24,6 @@ gnuplot -p -e "\
     set title 'Random segments in a unit N-cube';\
     set xlabel 'dimension';\
     set ylabel 'average distance';\
-    plot for [p=2:*] '${datafile}' using 1:p with lines title columnhead(p).'-norm';\
+    set key font ',6';\
+    plot for [p=2:*] '${datafile}' using 1:p with lines title columnhead(p);\
     "

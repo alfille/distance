@@ -36,6 +36,47 @@ void help( void )
  */
 double genrand64_real1(void) ;
 
+// Separate mantissa and exponent
+// can be a little loose 
+struct Exp {
+    double m ;
+    int e ;
+} ;
+
+void ExpPrint( char * s, struct Exp * exp ) {
+    printf( "%s %g : %d = %g\n",s,exp->m,exp->e,ldexp(exp->m,exp->e) );
+}
+
+// s -> E
+#define ExpMake( scalar, res_exp ) do { \
+    (res_exp).m = frexp( (scalar) , &( (res_exp).e) ) ; \
+    } while (0)
+    
+// multiply mantissa, and calculate new expoment
+// E * s -> E
+#define ExpMult( _exp, scalar, res_exp ) do { \
+    int e ; \
+    (res_exp).m = frexp( (_exp).m * (scalar) , &e ) ; \
+    (res_exp).e = e + (_exp).e ; \
+    } while (0)
+    
+// shift 'b' to 'a' exponent, add, and calculate new exponent from offset
+// E + E -> E
+#define ExpAdd( a_exp, b_exp, res_exp ) do { \
+    int e ; \
+    (res_exp).m = frexp( (a_exp).m + ldexp( (b_exp).m, (b_exp).e - (a_exp).e ) , &e ) ;\
+    (res_exp).e = e + (a_exp).e; \
+    } while (0)
+
+// get fancy -- take integer part of exponent/(root) separately
+// E ** s -> s
+#define ExpRoot( _exp, root, result ) do {\
+    int e, mult = (_exp).e / (root) ; \
+    result = ldexp( pow( ldexp( (_exp).m, (_exp).e % (root) ), 1./(root) ) , mult ) ; \
+    } while (0)
+    
+
+
 int main( int argc, char **argv )
 {
     int Dimensions = 100 ;
@@ -79,22 +120,31 @@ int main( int argc, char **argv )
     srand(time(0));
 
     // Initialize totals to zero
-    double totals[Dimensions+1][Powers];
+    double totals[Dimensions][Powers];
     int d,p;
-    for (d=0; d <= Dimensions; ++d) {
+    for (d=0; d < Dimensions; ++d) {
         for (p=0; p<Powers; ++p) {
             totals[d][p] = 0.;
         }
     }
 
-    double sums[Dimensions+1][Powers];
-    int sums_exp[Dimensions+1][Powers];
+
+    // Basically the algorhythm is to compute a dx for each dimension
+    // then compute the series dx, dx^2, dx^3 ... (easy interative multiplication)
+    // compute sequentially dx^n for each dimension
+    // then take ^1/p  for each p and sum.
+
+    struct Exp sums[Dimensions+1][Powers];
+    for ( p=0; p<Powers ; ++p ) {
+        ExpMake( 0., sums[0][p] ) ;
+    }
 
     // Generate and add up sums of coordinate differences at various dimensions
     // from two randomly generated points in the hypercube.
     for (long r = 0; r < Randoms; ++r) {
         // fill in the sum of powers for a single sample at various dimensions
-        // and powers.
+        // and powers
+
         for (d=1; d <= Dimensions; ++d) {
             // For each dimension, get 2 coordinates in this dimension.
             // we only care about dx, the delta in the coordinate
@@ -104,38 +154,30 @@ int main( int argc, char **argv )
 
             // for each power, the sum will be the entry from the row above
             // plus dx raised to that power.
-            double cum_prod = 1;
-            int cum_exp = 0 ;
+            struct Exp cum ;
+            ExpMake( 1., cum ) ;
+                        
             for (p=0; p<Powers; ++p) {
-                int e ;
-                cum_prod = frexp( cum_prod * dx, &e );
-                cum_exp += e ;
-                if ( d == 1 ) {
-                    // First row, just place in sum
-                    sums[1][p] = cum_prod ;
-                    sums_exp[1][p] = cum_exp ;
-                } else {
-                    // add mantissa from prior sum expoment
-                    double shiftsum = sums[d-1][p] + ldexp(cum_prod,cum_exp-sums_exp[d-1][p]) ;
-                    sums[d][p] = frexp( shiftsum, &e ) ;
-                    sums_exp[d][p] = sums_exp[d-1][p] + e ;
-                }
+                ExpMult( cum, dx, cum ) ;
+                ExpAdd( sums[d-1][p], cum, sums[d][p] ) ; 
             }
         }
 
         // Add the pth root of each sum to the totals
         for (d=1; d <= Dimensions; ++d) {
             for (p=0; p<Powers; ++p) {
+                double root ;
+                ExpRoot( sums[d][p], p+1, root ) ;
                 // get fancy -- take integer part of exponent/(p+1) separately
-                totals[d][p] += ldexp( pow(ldexp(sums[d][p],sums_exp[d][p]%(p+1)), 1./(p+1)), sums_exp[d][p] / (p+1) );
+                totals[d][p] += root;
             }
         }
     }
 
     // Title line
     printf("DIM\\Power, ");
-    for (p=1;p<=Powers;++p) {
-        printf("%d, ",p);
+    for (p=0;p<Powers;++p) {
+        printf("%d, ",p+1);
     }
     printf("\n");
 
@@ -149,7 +191,7 @@ int main( int argc, char **argv )
             if (Normalize) {
                 for (p=0;p<Powers;++p){
                     // note p is 0-indexed in C, but 1-indexed for calculation
-                    printf("%g, ", totals[d][p]/Randoms/pow(d,1/(1.+p)));
+                    printf("%g, ", totals[d][p]/Randoms/pow(d,1./(1+p)));
                 }
             } else {
                 for (p=0;p<Powers;++p){
