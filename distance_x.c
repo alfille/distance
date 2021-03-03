@@ -120,7 +120,7 @@ int main( int argc, char **argv )
     srand(time(0));
 
     // Initialize totals to zero
-    double totals[Dimensions][Powers];
+    double totals[Dimensions+1][Powers];
     int d,p;
     for (d=0; d < Dimensions; ++d) {
         for (p=0; p<Powers; ++p) {
@@ -128,6 +128,12 @@ int main( int argc, char **argv )
         }
     }
 
+    // Title line
+    printf("DIM\\Power, ");
+    for (p=0;p<Powers;++p) {
+        printf("%d, ",p+1);
+    }
+    printf("\n");
 
     // Basically the algorhythm is to compute a dx for each dimension
     // then compute the series dx, dx^2, dx^3 ... (easy interative multiplication)
@@ -160,12 +166,8 @@ int main( int argc, char **argv )
             for (p=0; p<Powers; ++p) {
                 ExpMult( cum, dx, cum ) ;
                 ExpAdd( sums[d-1][p], cum, sums[d][p] ) ; 
-            }
-        }
 
-        // Add the pth root of each sum to the totals
-        for (d=1; d <= Dimensions; ++d) {
-            for (p=0; p<Powers; ++p) {
+                // Add the pth root of each sum to the totals
                 double root ;
                 ExpRoot( sums[d][p], p+1, root ) ;
                 // get fancy -- take integer part of exponent/(p+1) separately
@@ -173,13 +175,6 @@ int main( int argc, char **argv )
             }
         }
     }
-
-    // Title line
-    printf("DIM\\Power, ");
-    for (p=0;p<Powers;++p) {
-        printf("%d, ",p+1);
-    }
-    printf("\n");
 
     // Loop though dimensions
     for (d=1; d <= Dimensions; ++d) {
