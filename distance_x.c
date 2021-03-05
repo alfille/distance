@@ -64,8 +64,13 @@ void ExpPrint( char * s, struct Exp * exp ) {
 // E + E -> E
 #define ExpAdd( a_exp, b_exp, res_exp ) do { \
     int e ; \
-    (res_exp).m = frexp( (a_exp).m + ldexp( (b_exp).m, (b_exp).e - (a_exp).e ) , &e ) ;\
-    (res_exp).e = e + (a_exp).e; \
+    if ( (a_exp).e > (b_exp).e ) { \
+        (res_exp).m = frexp( (a_exp).m + ldexp( (b_exp).m, (b_exp).e - (a_exp).e ) , &e ) ;\
+        (res_exp).e = e + (a_exp).e; \
+    } else { \
+        (res_exp).m = frexp( (b_exp).m + ldexp( (a_exp).m, (a_exp).e - (b_exp).e ) , &e ) ;\
+        (res_exp).e = e + (b_exp).e; \
+    } \
     } while (0)
 
 // get fancy -- take integer part of exponent/(root) separately
@@ -114,7 +119,6 @@ int main( int argc, char **argv )
             break ;
         }
     }
-
 
     // Initialize random seed
     srand(time(0));
@@ -165,12 +169,13 @@ int main( int argc, char **argv )
                         
             for (p=0; p<Powers; ++p) {
                 ExpMult( cum, dx, cum ) ;
-                ExpAdd( sums[d-1][p], cum, sums[d][p] ) ; 
+                ExpAdd( sums[d-1][p], cum, sums[d][p] ) ;
 
                 // Add the pth root of each sum to the totals
                 double root ;
-                ExpRoot( sums[d][p], p+1, root ) ;
                 // get fancy -- take integer part of exponent/(p+1) separately
+                ExpRoot( sums[d][p], p+1, root ) ;
+
                 totals[d][p] += root;
             }
         }
