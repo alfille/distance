@@ -175,8 +175,17 @@ int main( int argc, char **argv )
                 double root ;
                 // get fancy -- take integer part of exponent/(p+1) separately
                 ExpRoot( sums[d][p], p+1, root ) ;
+                if ( root > 1E4 ) {
+                    printf("\n\nBad root d=%d p=%d root=%g\n",d,p,root) ;
+                }
 
+                double t = totals[d][p] ;
                 totals[d][p] += root;
+                if ( totals[d][p] > 1E6 ) {
+                    ExpPrint("\nHigh",&(sums[d][p]));
+                    ExpPrint("Cum",&cum);
+                    printf("d=%d p=%d, total=%g root=%g t=%g\n",d,p,totals[d][p],root,t);
+                }
             }
         }
     }
