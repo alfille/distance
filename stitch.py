@@ -101,7 +101,7 @@ def CommandLine():
 if __name__ == '__main__': # command line
     args = CommandLine() # Get args from command line
 
-    names = [os.path.splitext(os.path.basename(a))[0] for a in sys.argv][1:]
+    names = [os.path.splitext(os.path.basename(a.name))[0] for a in args.CSV]
 
     CSVclasses = [CSVfile(*z,args.slice) for z in zip( names, args.CSV )]
 
