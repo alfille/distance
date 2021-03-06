@@ -37,21 +37,30 @@ void help( void )
 double genrand64_real1(void) ;
 
 // Separate mantissa and exponent
-// can be a little loose 
+// can be a little loose
+// This is an object-oriented approach to C
+//
+// uses the C-library frexp and ldexp functions with give mantissa and 2^exponent
 struct Exp {
-    double m ;
-    int e ;
+    double m ; // mantissa
+    int e ; // exponent
 } ;
 
-void ExpPrint( char * s, struct Exp * exp ) {
-    printf( "%s %g : %d = %g\n",s,exp->m,exp->e,ldexp(exp->m,exp->e) );
-}
-
 // s -> E
-#define ExpMake( scalar, res_exp ) do { \
+#define ExpEncode( scalar, res_exp ) do { \
     (res_exp).m = frexp( (scalar) , &( (res_exp).e) ) ; \
     } while (0)
     
+// E -> s
+#define ExpDecode( _exp ) ldexp( (_exp).m, (_exp).e ) 
+    
+void _ExpPrint( char * s, struct Exp * pexp ) {
+    printf( "%s %g : %d = %g\n",s,pexp->m,pexp->e,ExpDecode(*pexp) );
+}
+
+// E displayed (wrapper of _ExpPrint to avoid pointer syntax in use)
+#define ExpPrint( string, _exp ) _ExpPrint( (string) , & (_exp) )
+
 // multiply mantissa, and calculate new expoment
 // E * s -> E
 #define ExpMult( _exp, scalar, res_exp ) do { \
@@ -80,8 +89,6 @@ void ExpPrint( char * s, struct Exp * exp ) {
     result = ldexp( pow( ldexp( (_exp).m, (_exp).e % (root) ), 1./(root) ) , mult ) ; \
     } while (0)
     
-
-
 int main( int argc, char **argv )
 {
     int Dimensions = 100 ;
@@ -120,13 +127,10 @@ int main( int argc, char **argv )
         }
     }
 
-    // Initialize random seed
-    srand(time(0));
-
     // Initialize totals to zero
     double totals[Dimensions+1][Powers];
     int d,p;
-    for (d=0; d < Dimensions; ++d) {
+    for (d=0; d <= Dimensions; ++d) {
         for (p=0; p<Powers; ++p) {
             totals[d][p] = 0.;
         }
@@ -146,7 +150,7 @@ int main( int argc, char **argv )
 
     struct Exp sums[Dimensions+1][Powers];
     for ( p=0; p<Powers ; ++p ) {
-        ExpMake( 0., sums[0][p] ) ;
+        ExpEncode( 0., sums[0][p] ) ;
     }
 
     // Generate and add up sums of coordinate differences at various dimensions
@@ -156,41 +160,35 @@ int main( int argc, char **argv )
         // and powers
 
         for (d=1; d <= Dimensions; ++d) {
-            // For each dimension, get 2 coordinates in this dimension.
+            // For each dimension, get 2 (random) coordinates for this dimension (for each end of the line segment)
             // we only care about dx, the delta in the coordinate
-            // use abs value for odd powers calculation
+            // use absolute value for odd powers calculation
             double dx ;
             dx = fabs( genrand64_real1() - genrand64_real1() );
 
             // for each power, the sum will be the entry from the row above
             // plus dx raised to that power.
-            struct Exp cum ;
-            ExpMake( 1., cum ) ;
+            struct Exp dx_raised ;
+            ExpEncode( 1., dx_raised ) ; // 0-th power
                         
             for (p=0; p<Powers; ++p) {
-                ExpMult( cum, dx, cum ) ;
-                ExpAdd( sums[d-1][p], cum, sums[d][p] ) ;
 
-                // Add the pth root of each sum to the totals
-                double root ;
+                // Multiple by dx to get dx^p
+                ExpMult( dx_raised, dx, dx_raised ) ;
+
+                // Add the dimension to random segment of prior dimension
+                ExpAdd( sums[d-1][p], dx_raised, sums[d][p] ) ;
+
+                // Add the pth root (p-norm) of each vector to the totals
                 // get fancy -- take integer part of exponent/(p+1) separately
-                ExpRoot( sums[d][p], p+1, root ) ;
-                if ( root > 1E4 ) {
-                    printf("\n\nBad root d=%d p=%d root=%g\n",d,p,root) ;
-                }
-
-                double t = totals[d][p] ;
-                totals[d][p] += root;
-                if ( totals[d][p] > 1E6 ) {
-                    ExpPrint("\nHigh",&(sums[d][p]));
-                    ExpPrint("Cum",&cum);
-                    printf("d=%d p=%d, total=%g root=%g t=%g\n",d,p,totals[d][p],root,t);
-                }
+                double length ; // segment length (in p-norm)
+                ExpRoot( sums[d][p], p+1, length ) ;
+                totals[d][p] += length;
             }
         }
     }
 
-    // Loop though dimensions
+    // Loop though solutions for averaging (norming) and display
     for (d=1; d <= Dimensions; ++d) {
         // Start line with dimension
         printf("%d, ",d);
