@@ -4,26 +4,8 @@
 This is a fun math exercise.
 ![Taste](images/sample.png)
 
-- [distance](#distance)
-  * [One dimension:](#one-dimension-)
-    + [Mathematically:](#mathematically-)
-  * [Two Dimensions](#two-dimensions)
-  * [Higher Dimensions](#higher-dimensions)
-  * [Monti Carlo method](#monti-carlo-method)
-- [Program](#program)
-  * [Getting it](#getting-it)
-  * [Simple installation](#simple-installation)
-  * [Usage](#usage)
-  * [Example](#example)
-  * [Precision](#precision)
-  * [Results](#results)
-- [Plotting](#plotting)
-- [Parallel processing](#parallel-processing)
-- [Discussion](#discussion)
-  * [Known results](#known-results)
-  * [Further](#further)
 
-## One dimension:
+## One dimension
 ![line](images/1D.png)
 
 Consider a pair of point chosen randomly on a unit line segment:
@@ -32,7 +14,7 @@ Consider a pair of point chosen randomly on a unit line segment:
 * Can you prove it mathematically?
 * Can you test it by trying a lot of random points?
 
-### Mathematically:
+### Mathematically
 ![1D](images/1Deqn.png) 
 Plug into [maxima](http://maxima.cesga.es/):
 > integrate((integrate(b-a,b,a,1)+integrate(a-b,b,0,a)),a,0,1);
@@ -107,7 +89,7 @@ Actually, if you download the code you only need any C compiler
 `cc -o distance distance.c`
 
 ### High resolution
-See below under advanced for high-resolution versions
+See [below](#Higher-resolution) for high-resolution versions
  
 
 ## Usage
@@ -169,9 +151,12 @@ Lets pivot the analysis to p-norm segment limit at increasing dimension
 # Plotting
 Although the examples here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
 
-* either pipe data directly `./distance -r10000 -n| ./plot.sh`
+* `plot.sh` is a script included to simplify setting up gnuplot
+ * Pipe usage: `./distance -r10000 -n| ./plot.sh`
 ![gnuplot](images/gnuplot.png)
-or use the filename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
+ * Filename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
+* `stitch.py` allows more than one file to be included on the same plot.
+ * Example: `python3 plot1.csv plot2.csv -s "::10" | plot.sh` will plot every 10th value (every 10th norm) while maintaining row and column headings
 
 
 # Parallel processing
@@ -181,11 +166,14 @@ There is an [impressive rework](https://github.com/kms15/cubedistance) of this p
 ### distance 
  * The standard `distance` program suffers from:
  * Poor random number algorhythm (C library `rand()` )
- * double precision limitations 53-bit mantissa, exponent 10^-308
+ * double precision limitations: 
+ 	* 53-bit mantissa
+ 	* minimum exponent 10^-308
  * stack allocation of large arrays
- * Specifically the concern about precision is that at high power dx^p could pinned at zero (0<dx<1)
+ * The concern about precision is that at high power dx^p could pinned at zero (0<dx<1)
  * The segment length (dx) is weighted to shorter lengths (see [bin.py](example/bin.py)) ![histogram](images/histogram.png) 
  * so 2% of samples will be <.01 -- underflow at p=150 causing a systematic underestimation
+ * See [example](example/d.csv)
 
 ###  distance_hr
  * `distance_hr` uses high resolution floating point variables
@@ -194,17 +182,44 @@ There is an [impressive rework](https://github.com/kms15/cubedistance) of this p
  * Uses [Mersenne twister](https://en.wikipedia.org/wiki/Mersenne_Twister) for random generation
  * build the program with `make distance_hr` (or `make all`) then `chmod +x distance_hr`
  * options are the same as for `distance`
- * by default, results are 32 digits long
+ * by default, the displayed results are 32 digits long
+ * See [example](example/d_hr.csv)
 
 ###  distance_x
-* `distance_x` improves on distance by addressing underflow and random number algorhythm
-* Standard C library only is needed
+* `distance_x` improves on distance by addressing underflow and the random number algorhythm
+* Standard C library the only requirement
 * A modified version of the [Mersenne Twister](http://www.math.sci.hiroshima-u.ac.jp/m-mat/MT/VERSIONS/C-LANG/mt19937-64.c) is used.
  * uses time() for a seed
  * removes non-relevant routines
-* Floating point math is performed on the mantissa and exponent separately using ldexp and frexp avoiding underflow
+* Floating point math is performed on the mantissa and exponent separately using `ldexp` and `frexp` avoiding underflow
 * build the program with `make distance_x` (or `make all`) then `chmod +x distance_x`
 * options are the same as for `distance`
+ * See [example](example/d_x.csv)
+
+### comparison of precision methods
+```
+# use same settings for all three versions
+# norms to 200, dimensions to 100 (limited by stack size)
+./distance    -p 200 -d 100 -r 10000 -n > example/d.csv
+./distance_x  -p 200 -d 100 -r 10000 -n > example/d_x.csv
+./distance_hr -p 200 -d 100 -r 10000 -n > example/d_hr.csv
+#
+# stitch plots together and display a few curves
+python3 ./stitch.py example/d.csv example/d_x.csv example/d_hr.csv -s "::30" | ./plot.sh
+```
+![Compare precisions](images/compare.png)
+
+The general result is very close, but perhaps a trend for undercounting in the lower resolution techniques. Here are normalized results for selected p values at dimension=100 for the 3 programs:
+
+Program | dimension|p=100 | p=150 | p=200 |
+:--|:-:|:--|:--|:--|
+distance|100|0.871784|0.884618|0.891208|
+distance_x|100|0.871049|0.883861|0.890439|
+distance_hr|100|0.872511017892252|0.885361412255479|0.891956751751939|
+hr/simple|ratio|1.00083|1.00084|1.00084|
+ 
+
+For comparison, the relative time for the _hr version is 100-fold or more for the same calculation. Undoubtedly excess precision is specified.
 
 # Discussion
 
