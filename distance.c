@@ -132,18 +132,14 @@ int main( int argc, char **argv )
         // Print out the distances
         for (p=0;p<Powers;++p) {
             if (Normalize) {
-                for (p=0;p<Powers;++p){
-                    // note p is 0-indexed in C, but 1-indexed for calculation
-                    printf("%g, ", totals[d][p]/Randoms/pow(d,1/(1.+p)));
-                }
+                // note p is 0-indexed in C, but 1-indexed for calculation
+                printf("%g, ", totals[d][p]/Randoms/pow(d,1/(1.+p)));
             } else {
-                for (p=0;p<Powers;++p){
-                    printf("%g, ", totals[d][p]/Randoms);
-                }
+                printf("%g, ", totals[d][p]/Randoms);
             }
-            // finish line
-            printf("\n");
         }
+        // finish line
+        printf("\n");
     }
 
     // success
