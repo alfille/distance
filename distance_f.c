@@ -7,16 +7,17 @@
 
 void help( void )
 {
-    printf("distance_any -- find the average distance between random points in\n") ;
+    printf("distance_f -- find the average distance between random points in\n") ;
     printf("\ta unit N-cube using Monti Carlo method.\n");
     printf("\n");
     printf("By Paul H Alfille 2021 -- MIT license\n") ;
     printf("\n");
     printf("Output is CSV file format to make easy manipulation.\n");
-    printf("A number of metrics are used including\n");
-    printf("\t1\t(Manhattan) |x1-x2| in each dimension\n");
-    printf("\t2\t(Euclidean) sqrt(sum((x1-x2)^2)) \n");
-    printf("\t3\t[sum((x1-x2)^3)]^1/3 \n");
+    printf("Uses f-metric l^p\n");
+    printf("\t1\tD = Sum( x1^p + x2^p + ... )\n");
+    printf("\t2\tNote that there is no ^(1/p) for the sum\n");
+    printf("\t3\tThe norm is no homogeneous -- i.e.\n");
+    printf("\t3\t\tD(c*x) != c*D(x) for vector x\n");
     printf("\n");
     printf("\t1\tArbitrary -- any values >0 including non-integer are allowed\n");
     printf("\n");
@@ -209,14 +210,14 @@ int main( int argc, char **argv )
             // for each power, the sum will be the entry from the row above
             // plus dx raised to that power.
             for (int ip=0; ip<powerlist->size; ++ip) {
-                sums[d][ip] = sums[d-1][ip] + pow(dx,powerlist->val[ip]);
+                sums[d][ip] = sums[d-1][ip] + pow(dx,powerlist->val[ip]) ;
             }
         }
 
         // Add the pth root of each sum to the totals
         for (int d=1; d <= Dimensions; ++d) {
             for (int ip=0; ip<powerlist->size; ++ip) {
-                totals[d][ip] += pow(sums[d][ip], 1./powerlist->val[ip]);
+                totals[d][ip] += sums[d][ip] ;
             }
         }
     }
@@ -236,7 +237,7 @@ int main( int argc, char **argv )
         // Print out the distances
         for (int ip=0;ip<powerlist->size;++ip) {
             if (Normalize) {
-                printf("%g, ", totals[d][ip]/Randoms/pow(d,1/powerlist->val[ip]));
+                printf("%g, ", totals[d][ip]/Randoms/d);
             } else {
                 printf("%g, ", totals[d][ip]/Randoms);
             }
