@@ -162,7 +162,7 @@ Although the examples here are done with Excel, there is a script based on the u
 # Parallel processing
 There is an [impressive rework](https://github.com/kms15/cubedistance) of this project by Dr. Kendrick Shaw using TensorFlow on GPUs with 400-fold speedup!
 
-# Higher resolution
+# Higher precision
 ### distance 
  * The standard `distance` program suffers from:
  * Poor random number algorhythm (C library `rand()` )
@@ -220,6 +220,46 @@ hr/simple|ratio|1.00083|1.00084|1.00084|
  
 
 For comparison, the relative time for the _hr version is 100-fold or more for the same calculation. Undoubtedly excess precision is specified.
+
+# Norms
+To this point, we've been using integral [norms](https://en.wikipedia.org/wiki/Lp_space#The_p-norm_in_finite_dimensions) -- ways of measuring distance. 
+
+## Arbitrary Lp norms
+
+In the Lp norm formula
+
+![](images/Lp.png)
+
+* There is no particular reason to use integer norms.
+ * For p>1 the triangle inequality applies
+ * For 0<p<1 the norm is *sub-addative* 
+* The program distance_any allows arbitrary (positive) norms to be specified
+ * Use the syntax for power: `distance_any -p "2_5"` for the range 2 through 5
+ * Use the syntax `distance_any -p "3_10_2.5"` to make the range increment 2.5 instead of the default 1
+ * Multiple choices can be specified: `distance_any -p ".5,2,100,3_5"`
+* Example unnormalized
+![pnorm](images/subaddative.png) 
+* Example normalized
+![pnorm - normed](images/subaddative_norm.png)
+
+## Arbitrary f-norms (lp norms)
+
+Another way to calculate norm that loses the homogenous property is the f-norm which defines lp space
+![f-norm](images/fnorm_eqn.png)
+
+* Note that there is no ^(1/p) for the entire sum)
+* Inhomogeneous ![inhomogeneous](images/inhomogeneous.png)
+* Can be investigated with `distance_f`
+* Syntax for powers of norm (p's) is same as `distance_any`
+* Example unnormalized: -- looks pretty linear
+* ![f-norm](images/fnorm.png)
+* Normalized:
+* ![fnorm normed](images/fnorm_norm.png)
+* Constant for all dimensions!
+ * Makes sense since each coordinate dimension is added independently
+ * Calculating:
+ * ![fnorm](images/fnorm_solved.png) for each dimension
+
 
 # Discussion
 
