@@ -75,7 +75,7 @@ git clone http://github.com/alfille/distance
 cd distance
 
 # Compile and make executable
-make
+make all
 chmod +x distance
 
 # optional to install
@@ -86,10 +86,10 @@ sudo cp distance /usr/bin/distance
 ```
 The only requirements are a working C complier and git
 Actually, if you download the code you only need any C compiler
-`cc -o distance distance.c`
+`cc -o -lm distance distance.c`
 
 ### High resolution
-See [below](#Higher-resolution) for high-resolution versions
+See [below](#Higher-resolution) for high-resolution versions. This will require the high resolution libraries [MPIR](https://mpir.org/) to be installed and linked in.
  
 
 ## Usage
@@ -149,18 +149,18 @@ Lets pivot the analysis to p-norm segment limit at increasing dimension
 * Since Linf devolves to the Max metric, it makes sense that values approach 1.0 ( i.e. the max value of an infinite number of random values in [0,1] -> 1 )
 
 # Plotting
-Although the examples here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
+Although many of the example graphs here are done with Excel, there is a script based on the ubiquitous [gnuplot](http://www.gnuplot.info/)
 
 * `plot.sh` is a script included to simplify setting up gnuplot
  * Pipe usage: `./distance -r10000 -n| ./plot.sh`
 ![gnuplot](images/gnuplot.png)
  * Filename as an argument `./plot.sh example/sample.csv`![gnuplot](images/sample.png)
 * `stitch.py` allows more than one file to be included on the same plot.
- * Example: `python3 plot1.csv plot2.csv -s "::10" | plot.sh` will plot every 10th value (every 10th norm) while maintaining row and column headings
+ * Example: `python3 ./stitch.py plot1.csv plot2.csv -s "::10" | ./plot.sh` will plot every 10th value (every 10th norm) while maintaining row and column headings
 
 
 # Parallel processing
-There is an [impressive rework](https://github.com/kms15/cubedistance) of this project by Dr. Kendrick Shaw using TensorFlow on GPUs with 400-fold speedup!
+There is an [impressive rework](https://github.com/kms15/cubedistance) of this project by Dr. Kendrick Shaw using TensorFlow on GPUs with 400-fold speedup! Further Dr. Shaw found that storing intermediate values in the naive implementation speeds up the single threaded approach as well. All programs here now use that optimization.
 
 # Higher precision
 ### distance 
